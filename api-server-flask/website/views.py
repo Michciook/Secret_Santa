@@ -17,13 +17,16 @@ def test():
     
 @views.route('/get_rooms/', methods=['GET'])
 def get_rooms():
-    try:
-        room_rows = db.session.query(Room).all()
-        data = [{'id': row.room_id, 'roomname': row.roomname, 'creator_id': row.creator_id } for row in room_rows]
-        return jsonify(data), 200
-    except Exception as e:
-        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+    if session.get("uid", False):
+        try:
+            room_rows = db.session.query(Room).all()
+            data = [{'id': row.room_id, 'roomname': row.roomname, 'creator_id': row.creator_id } for row in room_rows]
+            return jsonify(data), 200
+        except Exception as e:
+            return jsonify({'error': f'Internal server error: {str(e)}'}), 500
     
+    return jsonify({'message' : 'Login first!'})
+
 @views.route('/add_room/', methods=['POST'])
 def add_room():
     try:
