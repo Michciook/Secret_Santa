@@ -9,8 +9,8 @@ class Affiliation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     room_id = db.Column(db.Integer, db.ForeignKey('rooms.room_id'), nullable=False)
 
-    user = db.relationship('User', backref=db.backref('affiliations', lazy=True))
-    room = db.relationship('Room', backref=db.backref('affiliations', lazy=True))
+    user = db.relationship('User', back_populates='affiliations')
+    room = db.relationship('Room', back_populates='affiliations')
 
     def __repr__(self):
         return f'Affiliation id: {self.affiliation_id}, User: {self.user_id}, Room: {self.room_id}'
@@ -24,9 +24,8 @@ class User(db.Model):
     email = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
-    rooms = db.relationship(
-        'Room', secondary='affiliations', backref=db.backref('users', lazy='dynamic'), lazy='dynamic'
-    )
+    affiliations = db.relationship('Affiliation', back_populates='user', lazy=True)
+    rooms = db.relationship('Room', secondary='affiliations', viewonly=True, back_populates='users')
 
     def __repr__(self):
         return f'User id: {self.user_id}'
@@ -41,6 +40,8 @@ class Room(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 
     creator = db.relationship('User', backref=db.backref('created_rooms', lazy=True))
+    affiliations = db.relationship('Affiliation', back_populates='room', lazy=True)
+    users = db.relationship('User', secondary='affiliations', viewonly=True, back_populates='rooms')
 
     def __repr__(self):
         return f'Room id: {self.room_id}, Creator: {self.creator_id}'

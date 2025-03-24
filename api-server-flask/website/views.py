@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify
-from flask_jwt_extended import create_access_token
 from . import db
 from .models import Room
 
@@ -16,7 +15,7 @@ def test():
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
     
-@views.route('/api/get_rooms/', methods=['GET'])
+@views.route('/get_rooms/', methods=['GET'])
 def get_rooms():
     try:
         room_rows = db.session.query(Room).all()
